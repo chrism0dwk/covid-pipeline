@@ -1,0 +1,54 @@
+#!/bin/bash
+
+########################################################
+# Name: pipeline.sge				       #
+# Created: 2021-02-07				       #
+# Author: Chris Jewell <c.jewell@lancaster.ac.uk>      #
+# License: MIT					       #
+# Copyright: Chris Jewell 2021			       #
+# Purpose:  Specify covid job to run on an SGE cluster #
+#           with GPUS.                                 #
+# Run as: . ./pipeline.sge <ISO8601 date>              #
+########################################################
+
+#$ -S /bin/bash
+#$ -P chicas
+#$ -q gpu
+#$ -l ngpus=1
+# -l ncpus=4
+#$ -l h_vmem=64G
+#$ -l h_rt=12:00:00
+#$ -j y
+#$ -cwd
+
+. /etc/profile
+. $HOME/.bash_profile
+
+module add cuda/11.0
+
+export XLA_FLAGS="--xla_gpu_cuda_data_dir=$CUDA_HOME"
+
+if [ -z ${COVIDREFDATE+x} ]
+then
+    echo "Environment variable COVIDREFDATE must be set"
+    exit 1
+fi
+
+if [ -z ${COVIDRESULTSDIR+x} ]
+then
+    echo "Environment variable COVIDRESULTSDIR must be set"
+    exit 1
+fi
+
+DATEHIGH=`date -d "${COVIDREFDATE} - 4 days" +%F`
+DATELOW=`date -d "${COVIDREFDATE} - 88 days" +%F`
+
+echo Timeseries $DATELOW to $DATEHIGH
+echo Results dir $COVIDRESULTSDIR
+
+poetry run python -m covid.pipeline \
+       --config uk_config.yaml \
+       --date-range $DATELOW $DATEHIGH \
+       --results-directory ${COVIDRESULTSDIR}
+
+exit 0

@@ -7,11 +7,14 @@ license = "MIT"
 
 [tool.poetry.dependencies]
 python = "^3.7"
-covid19uk = {git = "git@fhm-chicas-code.lancs.ac.uk:jewell/covid19uk.git", rev="165670639318a2dac2ce4502e6bc67074b5659e6"}
+covid19uk = {git = "git@fhm-chicas-code.lancs.ac.uk:jewell/covid19uk.git", rev="6704d787d7a05233beced1c59205d1f1c0fa9820"}
+drmaa = "^0.7.9"
 
 [tool.poetry.dev-dependencies]
 ipython = "^7.20.0"
 jedi = "^0.17.2"
+flake8 = "^3.8.4"
+black = "^20.8b1"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

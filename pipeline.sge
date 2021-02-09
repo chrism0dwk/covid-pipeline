@@ -8,7 +8,6 @@
 # Copyright: Chris Jewell 2021			       #
 # Purpose:  Specify covid job to run on an SGE cluster #
 #           with GPUS.                                 #
-# Run as: . ./pipeline.sge <ISO8601 date>              #
 ########################################################
 
 #$ -S /bin/bash
@@ -20,6 +19,43 @@
 #$ -l h_rt=12:00:00
 #$ -j y
 #$ -cwd
+#$ -M c.jewell@lancaster.ac.uk
+#$ -m bea
+
+error_exit() {
+    MSG=${1:-"Unknown Error"}
+    echo $MSG 1>&2
+    exit 1
+}
+
+
+while getopts 'c:d:s:r:' OPTION; do
+    case "$OPTION" in
+	c)
+	    echo "Config: ${OPTARG}"
+	    arg_config=${OPTARG}
+	    ;;
+	d)
+	    echo "Date: ${OPTARG}"
+	    arg_date=${OPTARG}
+	    ;;
+	s)
+	    echo "Results staging dir: ${OPTARG}"
+	    arg_staging_dir=${OPTARG}
+	    ;;
+	r)
+	    echo "Results destination dir: ${OPTARG}"
+	    arg_results_dir=${OPTARG}
+	    ;;
+	:)
+	    echo "Error: -${OPTARG} requires an argument"
+	    exit 1
+	    ;;
+	*)
+	    exit 1
+	    ;;
+    esac
+done
 
 . /etc/profile
 . $HOME/.bash_profile
@@ -28,27 +64,18 @@ module add cuda/11.0
 
 export XLA_FLAGS="--xla_gpu_cuda_data_dir=$CUDA_HOME"
 
-if [ -z ${COVIDREFDATE+x} ]
-then
-    echo "Environment variable COVIDREFDATE must be set"
-    exit 1
-fi
 
-if [ -z ${COVIDRESULTSDIR+x} ]
-then
-    echo "Environment variable COVIDRESULTSDIR must be set"
-    exit 1
-fi
+DATEHIGH=`date -d "${arg_date}" +%F`
+DATELOW=`date -d "${arg_date} - 84 days" +%F`
 
-DATEHIGH=`date -d "${COVIDREFDATE} - 4 days" +%F`
-DATELOW=`date -d "${COVIDREFDATE} - 88 days" +%F`
-
-echo Timeseries $DATELOW to $DATEHIGH
-echo Results dir $COVIDRESULTSDIR
-
+echo Date range $DATELOW to $DATEHIGH
 poetry run python -m covid.pipeline \
-       --config uk_config.yaml \
-       --date-range $DATELOW $DATEHIGH \
-       --results-directory ${COVIDRESULTSDIR}
+      --config ${arg_config} \
+      --date-range $DATELOW $DATEHIGH \
+      --results-directory ${arg_staging_dir} ||
+   error_exit "Pipeline job failed"
+
+rsync -aP ${arg_staging_dir} ${arg_results_dir}  ||
+    error_exit "Error copying ${arg_staging_dir} to ${arg_results_dir}"
 
 exit 0

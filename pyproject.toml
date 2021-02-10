@@ -7,7 +7,7 @@ license = "MIT"
 
 [tool.poetry.dependencies]
 python = "^3.7"
-covid19uk = {git = "git@fhm-chicas-code.lancs.ac.uk:jewell/covid19uk.git", rev="6704d787d7a05233beced1c59205d1f1c0fa9820"}
+covid19uk = {git = "git@fhm-chicas-code.lancs.ac.uk:jewell/covid19uk.git", rev="65bd815"}
 drmaa = "^0.7.9"
 
 [tool.poetry.dev-dependencies]

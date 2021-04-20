@@ -72,8 +72,9 @@ echo Date range $DATELOW to $DATEHIGH
 poetry run python -m covid.pipeline \
       --config ${arg_config} \
       --date-range $DATELOW $DATEHIGH \
-      --results-directory ${arg_staging_dir} ||
-   error_exit "Pipeline job failed"
+      --results-directory ${arg_staging_dir} \
+      --aws -v ||
+    error_exit "Pipeline job failed"
 
 rsync -aP ${arg_staging_dir} ${arg_results_dir}  ||
     error_exit "Error copying ${arg_staging_dir} to ${arg_results_dir}"

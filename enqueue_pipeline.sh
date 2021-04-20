@@ -41,7 +41,7 @@ done
 source /usr/shared_apps/admin/etc/sge/switch-gpu.sh
 
 # Environment variables for date and results staging
-JOBNAME=c19_$arg_date_$arg_config
+JOBNAME=c19_${arg_date}_${arg_config}
 STDOUT=$arg_staging_dir/stdout.txt
 
 # Final results dir

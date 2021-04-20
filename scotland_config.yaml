@@ -22,9 +22,6 @@ ProcessData:
     format: ons
     regions:
       - S  # Scotland
-      - E  # England
-      - W  # Wales
-      - N # Northern Ireland
 
 Mcmc:
   dmax: 84  # Max distance to move events
@@ -46,5 +43,5 @@ Geopackage:  # covid.tasks.summary_geopackage
   base_layer: UK2019mod_pop_xgen
 
 AWSS3:
-  bucket: lancaster-covid-pipeline
-  profile: covid-pipeline
+  bucket=lancaster-covid-pipeline
+  profile=covid-pipeline

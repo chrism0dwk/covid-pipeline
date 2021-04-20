@@ -21,10 +21,7 @@ ProcessData:
     address:  "https://services1.arcgis.com/ESMARspQHYMw9BZ9/arcgis/rest/services/LAD_APR_2019_UK_NC/FeatureServer/0/query?where=1%3D1&outFields=LAD19CD,LAD19NM&returnGeometry=false&returnDistinctValues=true&orderByFields=LAD19CD&outSR=4326&f=json"
     format: ons
     regions:
-      - S  # Scotland
-      - E  # England
       - W  # Wales
-      - N # Northern Ireland
 
 Mcmc:
   dmax: 84  # Max distance to move events
@@ -44,7 +41,3 @@ ThinPosterior:  # Post-process further chain thinning HDF5 -> .pkl.
 Geopackage:  # covid.tasks.summary_geopackage
   base_geopackage: data/UK2019mod_pop.gpkg
   base_layer: UK2019mod_pop_xgen
-
-AWSS3:
-  bucket: lancaster-covid-pipeline
-  profile: covid-pipeline

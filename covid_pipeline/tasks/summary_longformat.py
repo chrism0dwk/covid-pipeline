@@ -7,8 +7,7 @@ import xarray
 
 from gemlib.util import compute_state
 from covid19uk.model_spec import STOICHIOMETRY
-from covid19uk import model_spec
-import covid19uk.version as model_version
+from covid19uk.version import VERSION as model_version
 
 from covid_pipeline.formats import make_dstl_template
 
@@ -146,8 +145,9 @@ def summary_longformat(input_files, output_file):
         group="Lancaster",
         model="SpatialStochasticSEIR",
         scenario="Nowcast",
+        model_type="Cases",
         creation_date=date.today(),
-        version=".".join(model_version()[:2]),
+        version=model_version,
         age_band="All",
         geography=df["location"],
         value_date=df["time"],
@@ -165,7 +165,9 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--output", "-o", type=str, required=True, help="Output file")
     parser.add_argument(
-        "resultsdir", type=str, help="Results directory",
+        "resultsdir",
+        type=str,
+        help="Results directory",
     )
     args = parser.parse_args()
 

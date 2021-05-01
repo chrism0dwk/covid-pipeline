@@ -31,16 +31,11 @@ def _expand_quantiles(q_dict):
         return quantiles
 
     for k, v in q_dict.items():
-        q_key = (
-            f"Quantile {float(k)}"  # Coerce back to float to strip trailing 0s
-        )
+        q_key = f"Quantile {float(k)}"  # Coerce back to float to strip trailing 0s
         if q_key not in quantiles.keys():
             raise KeyError(f"quantile '{k}' not compatible with template form")
         quantiles[q_key] = v
-    return [
-        pd.Series(v, name=k).reset_index(drop=True)
-        for k, v in quantiles.items()
-    ]
+    return [pd.Series(v, name=k).reset_index(drop=True) for k, v in quantiles.items()]
 
 
 def _split_dates(dates):
@@ -74,6 +69,9 @@ def make_dstl_template(
     value_date_parts = _split_dates(value_date)
     quantile_series = _expand_quantiles(quantiles)
 
+    # DSTL require only MAJOR and MINOR version number
+    version = ".".join(version.split(".")[:2])
+
     fields = {
         "Group": group,
         "Model": model,
@@ -91,9 +89,5 @@ def make_dstl_template(
         "ValueType": value_type,
         "Value": value,
     }
-    fields = [
-        pd.Series(v, name=k).reset_index(drop=True) for k, v in fields.items()
-    ]
-    return pd.concat(fields + quantile_series, axis="columns").ffill(
-        axis="index"
-    )
+    fields = [pd.Series(v, name=k).reset_index(drop=True) for k, v in fields.items()]
+    return pd.concat(fields + quantile_series, axis="columns").ffill(axis="index")

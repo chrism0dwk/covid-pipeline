@@ -236,27 +236,4 @@ def run_pipeline(global_config, results_directory, cli_options):
         wd("summary_longformat.xlsx"),
     )(summary_longformat)
 
-    # Copy results to AWS
-    @rf.active_if(cli_options.aws)
-    @rf.transform(
-        input=[
-            process_data,
-            run_mcmc,
-            insample7,
-            insample14,
-            medium_term,
-            reproduction_number,
-        ],
-        filter=rf.formatter(),
-        output="{subdir[0][0]}/{basename[0]}{ext[0]}",
-    )
-    def upload_to_aws(input_file, output_file):
-        config = global_config["AWSS3"]
-        obj_path = f"{config['bucket']}/{output_file}"
-        s3 = s3fs.S3FileSystem(profile=config["profile"])
-        if not s3.exists(obj_path):
-            s3.put(input_file, obj_path)
-        else:
-            warnings.warn(f"Path '{obj_path}' already exists, not uploading.")
-
     rf.cmdline.run(cli_options)

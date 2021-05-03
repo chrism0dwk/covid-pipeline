@@ -55,7 +55,6 @@ if __name__ == "__main__":
     data_args.add_argument(
         "--pillar", type=str, help="Pillar", choices=["both", "1", "2"]
     )
-    data_args.add_argument("--aws", action="store_true", help="Push to AWS")
 
     cli_options = argparser.parse_args()
     global_config = _import_global_config(cli_options.config)

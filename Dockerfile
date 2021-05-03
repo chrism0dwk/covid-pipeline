@@ -27,6 +27,4 @@ RUN /usr/bin/python3.7 get-pip.py
 # Install covid_pipeline
 RUN python3.7 -m pip install .
 
-ENV C19_CONFIG=./config.yaml
-
-CMD /usr/bin/python3.7 -m covid_pipeline.pipeline -c $C19_CONFIG -r /results
+ENDPOINT /usr/bin/python3.7 -m covid_pipeline.pipeline -c config.yaml -r /results

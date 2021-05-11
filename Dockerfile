@@ -27,4 +27,4 @@ RUN /usr/bin/python3.7 get-pip.py
 # Install covid_pipeline
 RUN python3.7 -m pip install .
 
-ENDPOINT /usr/bin/python3.7 -m covid_pipeline.pipeline -c config.yaml -r /results
+ENTRYPOINT ["/usr/bin/python3.7", "-m", "covid_pipeline.pipeline", "-c", "config.yaml", "-r", "/results"]

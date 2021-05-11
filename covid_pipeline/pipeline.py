@@ -42,19 +42,6 @@ if __name__ == "__main__":
         help="Date range [low high)",
         metavar="ISO6801",
     )
-    data_args.add_argument("--reported-cases", type=str, help="Path to case file")
-    data_args.add_argument(
-        "--commute-volume", type=str, help="Path to commute volume file"
-    )
-    data_args.add_argument(
-        "--case-date-type",
-        type=str,
-        help="Case date type (specimen | report)",
-        choices=["specimen", "report"],
-    )
-    data_args.add_argument(
-        "--pillar", type=str, help="Pillar", choices=["both", "1", "2"]
-    )
 
     cli_options = argparser.parse_args()
     global_config = _import_global_config(cli_options.config)
@@ -62,26 +49,5 @@ if __name__ == "__main__":
     if cli_options.date_range is not None:
         global_config["ProcessData"]["date_range"][0] = cli_options.date_range[0]
         global_config["ProcessData"]["date_range"][1] = cli_options.date_range[1]
-
-    if cli_options.reported_cases is not None:
-        global_config["ProcessData"]["CasesData"]["address"] = expandvars(
-            cli_options.reported_cases
-        )
-
-    if cli_options.commute_volume is not None:
-        global_config["ProcessData"]["commute_volume"] = expandvars(
-            cli_options.commute_volume
-        )
-
-    if cli_options.case_date_type is not None:
-        global_config["ProcessData"]["case_date_type"] = cli_options.case_date_type
-
-    if cli_options.pillar is not None:
-        opts = {
-            "both": ["Pillar 1", "Pillar 2"],
-            "1": ["Pillar 1"],
-            "2": ["Pillar 2"],
-        }
-        global_config["ProcessData"]["CasesData"]["pillars"] = opts[cli_options.pillar]
 
     run_pipeline(global_config, cli_options.results_directory, cli_options)

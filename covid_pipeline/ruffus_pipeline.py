@@ -18,6 +18,7 @@ from covid19uk import (
     predict,
     reproduction_number,
     within_between,
+    __version__ as covid19uk_version,
 )
 
 from covid_pipeline.tasks import (
@@ -42,6 +43,7 @@ def _create_metadata(config):
         created_at=str(datetime.now()),
         inference_library="GEM",
         inference_library_version="0.1.alpha0",
+        model_version=covid19uk_version,
         pipeline_config=json.dumps(config, default=str),
     )
 
@@ -74,10 +76,7 @@ def run_pipeline(global_config, results_directory, cli_options):
         assemble_data(output_file, config["ProcessData"])
 
     @rf.transform(
-        process_data,
-        rf.formatter(),
-        wd("posterior.hd5"),
-        global_config,
+        process_data, rf.formatter(), wd("posterior.hd5"), global_config,
     )
     def run_mcmc(input_file, output_file, config):
         mcmc(input_file, output_file, config["Mcmc"])
@@ -99,9 +98,7 @@ def run_pipeline(global_config, results_directory, cli_options):
     )(reproduction_number)
 
     rf.transform(
-        input=reproduction_number,
-        filter=rf.formatter(),
-        output=wd("national_rt.xlsx"),
+        input=reproduction_number, filter=rf.formatter(), output=wd("national_rt.xlsx"),
     )(overall_rt)
 
     # In-sample prediction
@@ -153,9 +150,7 @@ def run_pipeline(global_config, results_directory, cli_options):
 
     # Summarisation
     rf.transform(
-        input=reproduction_number,
-        filter=rf.formatter(),
-        output=wd("rt_summary.csv"),
+        input=reproduction_number, filter=rf.formatter(), output=wd("rt_summary.csv"),
     )(summarize.rt)
 
     rf.transform(
@@ -228,15 +223,7 @@ def run_pipeline(global_config, results_directory, cli_options):
 
     # DSTL Summary
     rf.transform(
-        [
-            [
-                process_data,
-                insample7,
-                insample14,
-                medium_term,
-                reproduction_number,
-            ]
-        ],
+        [[process_data, insample7, insample14, medium_term, reproduction_number,]],
         rf.formatter(),
         wd("summary_longformat.xlsx"),
     )(summary_longformat)

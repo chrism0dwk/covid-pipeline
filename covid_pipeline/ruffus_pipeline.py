@@ -4,10 +4,8 @@ import os
 from datetime import datetime
 from uuid import uuid1
 import json
-import warnings
 
 import yaml
-import s3fs
 import netCDF4 as nc
 import pandas as pd
 import ruffus as rf
@@ -28,6 +26,7 @@ from covid_pipeline.tasks import (
     case_exceedance,
     summary_geopackage,
     summary_longformat,
+    crystalcast_output,
 )
 
 __all__ = ["run_pipeline"]
@@ -218,6 +217,12 @@ def run_pipeline(global_config, results_directory, cli_options):
         wd("prediction.gpkg"),
         global_config["Geopackage"],
     )(summary_geopackage)
+
+    rf.transform(
+        input=[[process_data, thin_posterior, reproduction_number]],
+        filter=rf.formatter(),
+        output=wd("crystalcast.xlsx"),
+    )(crystalcast_output)
 
     rf.cmdline.run(cli_options)
 

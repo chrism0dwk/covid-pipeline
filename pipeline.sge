@@ -69,7 +69,7 @@ DATEHIGH=`date -d "${arg_date}" +%F`
 DATELOW=`date -d "${arg_date} - 84 days" +%F`
 
 echo Date range $DATELOW to $DATEHIGH
-poetry run python -m covid.pipeline \
+poetry run python -m covid_pipeline.pipeline \
       --config ${arg_config} \
       --date-range $DATELOW $DATEHIGH \
       --results-directory ${arg_staging_dir} \

@@ -12,7 +12,6 @@ ProcessData:
   CasesData:
     input: url
     address: https://api.coronavirus.data.gov.uk/v2/data?areaType=ltla&metric=newCasesBySpecimenDate&format=json
-#    address: /home/hpc/39/jewellcp/Projects/covid-production-pipeline/data/cases_2021-04-12_uk.csv
     pillars: None  # Capability to filter Pillar 1 and 2 testing data from PHE confidential line listing
     measure: None  # Capability to filter date of test report from PHE confidential line listing
     format: gov
@@ -22,22 +21,26 @@ ProcessData:
     address:  "https://services1.arcgis.com/ESMARspQHYMw9BZ9/arcgis/rest/services/LAD_APR_2019_UK_NC/FeatureServer/0/query?where=1%3D1&outFields=LAD19CD,LAD19NM&returnGeometry=false&returnDistinctValues=true&orderByFields=LAD19CD&outSR=4326&f=json"
     format: ons
     regions:
+      - S  # Scotland
+      - E  # England
+      - W  # Wales
       - N # Northern Ireland
 
 Mcmc:
   dmax: 84  # Max distance to move events
-  nmax: 50  # Max num events per metapopulation/time to move
+  nmax: 25  # Max num events per metapopulation/time to move
   m: 1      # Number of metapopulations to move
-  occult_nmax: 15  # Max number of occults to add/delete per metapop/time
-  num_event_time_updates: 35  # Num event and occult updates per sweep of Gibbs MCMC sampler.
+  occult_nmax: 8  # Max number of occults to add/delete per metapop/time
+  num_event_time_updates: 380  # Num event and occult updates per sweep of Gibbs MCMC sampler.
   num_bursts: 100  # Number of MCMC bursts of `num_burst_samples` 
   num_burst_samples: 50  # Number of MCMC samples per burst
   thin: 20  # Thin MCMC samples every `thin` iterations
   num_adaptation_iterations: 1000
-  
+
+
 ThinPosterior:  # Post-process further chain thinning HDF5 -> .pkl.
-  start: 3000
-  end: 
+  start: 3000 
+  end:
   by: 4
 
 Geopackage:  # covid.tasks.summary_geopackage

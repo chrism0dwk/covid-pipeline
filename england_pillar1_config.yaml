@@ -7,10 +7,11 @@ ProcessData:
   mobility_matrix: data/mergedflows.csv
   population_size: data/c2019modagepop.csv
   commute_volume:   # Can be replaced by DfT traffic flow data - contact authors <c.jewell@lancaster.ac.uk>
-
+  geopackage: data/UK2019mod_pop.gpkg
+  
   CasesData:
     input: csv
-    address: data/Anonymised Combined Line List 20210419.csv
+    address: data/Anonymised Combined Line List 20210426.csv
     pillars:
       - Pillar 1  # Capability to filter Pillar 1 and 2 testing data from PHE confidential line listing
     measure: specimen  # Capability to filter date of test report from PHE confidential line listing
@@ -28,15 +29,16 @@ Mcmc:
   nmax: 50  # Max num events per metapopulation/time to move
   m: 1      # Number of metapopulations to move
   occult_nmax: 15  # Max number of occults to add/delete per metapop/time
-  num_event_time_updates: 35  # Num event and occult updates per sweep of Gibbs MCMC sampler.
-  num_bursts: 200  # Number of MCMC bursts of `num_burst_samples` 
+  num_event_time_updates: 380  # Num event and occult updates per sweep of Gibbs MCMC sampler.
+  num_bursts: 100  # Number of MCMC bursts of `num_burst_samples` 
   num_burst_samples: 50  # Number of MCMC samples per burst
   thin: 20  # Thin MCMC samples every `thin` iterations
+  num_adaptation_iterations: 1000
 
 ThinPosterior:  # Post-process further chain thinning HDF5 -> .pkl.
-  start: 6000
-  end: 10000
-  by: 10
+  start: 3000
+  end: 
+  by: 4
 
 Geopackage:  # covid.tasks.summary_geopackage
   base_geopackage: data/UK2019mod_pop.gpkg

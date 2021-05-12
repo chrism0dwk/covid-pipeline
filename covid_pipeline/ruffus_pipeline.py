@@ -42,7 +42,7 @@ def _create_metadata(config):
         pipeline_id=uuid1().hex,
         created_at=str(datetime.now()),
         inference_library="GEM",
-        inference_library_version="0.1.alpha0",
+        inference_library_version="0.1.1-alpha.1",
         model_version=covid19uk_version,
         pipeline_config=json.dumps(config, default=str),
     )
@@ -214,7 +214,7 @@ def run_pipeline(global_config, results_directory, cli_options):
     )(summary_geopackage)
 
     rf.transform(
-        input=[[process_data, thin_posterior, reproduction_number]],
+        input=[[process_data, thin_samples, reproduction_number]],
         filter=rf.formatter(),
         output=wd("crystalcast.xlsx"),
     )(crystalcast_output)

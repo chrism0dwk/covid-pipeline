@@ -123,10 +123,10 @@ def crystalcast_output(input_files, output):
     :param output: name of output XLSX file
     """
 
-    constant_data = xarray.open_dataset(files[0], group="constant_data")
-    with open(files[1], "rb") as f:
+    constant_data = xarray.open_dataset(input_files[0], group="constant_data")
+    with open(input_files[1], "rb") as f:
         samples = pkl.load(f)
-    rt = xarray.open_dataset(files[2], group="posterior_predictive")
+    rt = xarray.open_dataset(input_files[2], group="posterior_predictive")
 
     # xarray-ify events tensor for ease of reduction
     event_samples = _events2xarray(samples, constant_data)

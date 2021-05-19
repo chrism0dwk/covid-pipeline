@@ -12,11 +12,11 @@
 
 #$ -S /bin/bash
 #$ -P chicas
-#$ -q gpu
+#$ -q medium
 #$ -l ngpus=1
 # -l ncpus=4
 #$ -l h_vmem=64G
-#$ -l h_rt=12:00:00
+#$ -l h_rt=24:00:00
 #$ -j y
 #$ -cwd
 #$ -M c.jewell@lancaster.ac.uk
@@ -77,10 +77,24 @@ poetry run python -m covid_pipeline.pipeline \
     error_exit "Pipeline job failed"
 
 # Push results to bucket
+BASENAME=`basename ${arg_staging_dir}`
+BUCKET_DIR=${arg_results_dir}/${BASENAME}
+
 module add aws-cli
 aws --endpoint-url https://fhm-chicas-storage.lancs.ac.uk s3 \
     --profile covid-pipeline-data \
-    cp --recursive ${arg_staging_dir} ${arg_results_dir}/`basename ${arg_staging_dir}`
+    cp --recursive ${arg_staging_dir} ${BUCKET_DIR}
 
+# Trigger report
+REPORTBRANCH=master
+if [[ `echo ${BASENAME} | cut -d"_" -f2`=="england1" ]]; then
+    REPORTBRANCH=england1
+fi
+
+curl -X POST \
+     -F token=af97c2c166429bf85006261a040886 \
+     -F "ref=$REPORTBRANCH" \
+     -F "variables[S3TARGET]=${BUCKET_DIR}" \
+     https://fhm-chicas-code.lancs.ac.uk/api/v4/projects/163/trigger/pipeline
 
 exit 0

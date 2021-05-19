@@ -61,6 +61,16 @@ def _xarray2dstl(xarr, value_type, geography):
     )
 
 
+def _has_ewsni(locations):
+    """Checks to see if all England, Wales, Scotland, NI DAs are
+       present in `locations`.  Return True if so, False otherwise.
+    """
+    country_codes = locations.astype(str).str[0]
+    if xarray.DataArray(['E','W','S','N']).isin(country_codes).all():
+        return True
+    return False
+
+
 def incidence(event_samples, popsize):
     """Select infection events, aggregate over location, divide by total popsize"""
     infection_events = (
@@ -137,12 +147,16 @@ def crystalcast_output(input_files, output):
     # population
     population = constant_data["N"]
 
-    # UK
-    df = [summarize_supergeography(event_samples, rt, population, "United Kingdom")]
-
+    # If all DAs are present, create UK summary
+    df = []
+    if _has_ewsni(rt.coords['location']):
+        df.append(summarize_supergeography(event_samples, rt, population, "United Kingdom"))
+ 
     # DAs
     for country in ["England", "Scotland", "Wales", "Northern Ireland"]:
         regions = event_samples.coords["location"].str.startswith(country[0])
+        if regions.sum() == 0:
+            continue
         country_samples = event_samples.sel(location=regions)
         country_population = population.sel(location=regions)
         country_rt = rt.sel(location=regions)

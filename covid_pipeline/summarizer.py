@@ -266,6 +266,23 @@ def make_summary(
     quantiles=(0.025, 0.975),
     dim="iteration",
 ):
+    """Make a summarisation function
+
+    :param mean: should the mean be included?
+    :param quantiles: requests quantiles to be summarised
+    :param dim: dimension to summarize across.
+    :returns: an xarray.Dataset containing arrays with mean, quantiles.
+
+    Usage:
+    ```
+    from covid_pipeline import PosteriorPredictiveFunctions
+    from covid_pipeline import make_summary
+    posterior_predictive = PosteriorPredictiveFunctions("/path/to/results", aggegate=False)
+    summary = make_summary(mean=True, quantiles=(0.025, 0.5, 0.975))
+    summary_xarr = summary(posterior_predictive.relative_incidence())
+    summary_xarr.to_dataframe() # Format at pandas dataframe
+    ```
+    """
     def fn(samples):
         data_arrays = {}
         if mean is True:

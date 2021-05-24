@@ -261,60 +261,6 @@ class PosteriorPredictiveFunctions(PosteriorFunctions):
         )
 
 
-class Summarizer:
-    """`Summarizer` attaches to an instance of `PosteriorMetrics` and
-    wraps its methods in a summary function."""
-
-    def __init__(
-        self,
-        posterior_functions,
-        mean=True,
-        quantiles=(0.025, 0.975),
-    ):
-        """Create a `Summarizer` class to summarise quantities in
-           `posterior_functions` over the 'iterations' dimension.
-
-        :param posterior_functions: an instance of class `PosteriorMetrics`
-        :param mean: should the mean be computed?
-        :param quantiles: a tuple of required quantiles
-        """
-
-        self.__pf = posterior_functions
-        self.__mean = True if mean is True else False
-        self.__quantiles = quantiles
-
-        pf_methods = [m for m in dir(self.__pf) if m[0] != "_"]
-        for method in pf_methods:
-            self.__dict__[method] = self._summarize(getattr(self.__pf, method))
-
-    def _summarize(self, func):
-        def summary(dataset, dim="iteration"):
-            if dataset is None:
-                return None
-
-            if "iteration" not in dataset.dims:
-                warn(
-                    "Dimension 'iteration' not found in dataset.  Returning unsummarised."
-                )
-                return dataset
-
-            data_arrays = {}
-            if self.__mean:
-                data_arrays["mean"] = dataset.mean(dim=dim)
-                for q in self.__quantiles:
-                    data_arrays[f"q{q}"] = dataset.quantile(
-                        q=q, dim=dim
-                    ).reset_coords(drop=True)
-            return xarray.Dataset(data_arrays)
-
-        def fn(*args, **kwargs):
-            return summary(func(*args, **kwargs))
-
-        fn.__doc__ = func.__doc__
-
-        return fn
-
-
 def make_summary(
     mean=True,
     quantiles=(0.025, 0.975),

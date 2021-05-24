@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "covid-pipeline"
-version = "0.1.1-alpha.0"
+version = "0.1.1-alpha.5"
 description = "COVID19 daily production"
 authors = ["Chris Jewell <c.jewell@lancaster.ac.uk>"]
 license = "MIT"

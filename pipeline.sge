@@ -89,7 +89,7 @@ aws --endpoint-url https://fhm-chicas-storage.lancs.ac.uk s3 \
 REPORTBRANCH=master
 GEOGRAPHY=`echo ${BASENAME} | cut -d"_" -f2`
 echo "Reporting for geography '$GEOGRAPHY'"
-if [[ $GEOGRAPHY=="england1" ]]; then
+if [ $GEOGRAPHY = england1 ]; then
     REPORTBRANCH=england1
 fi
 

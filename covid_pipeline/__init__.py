@@ -1,7 +1,7 @@
 """Covid19UK pipeline"""
 
 
-from summarizer import (
+from covid_pipeline.summarizer import (
     PosteriorFunctions,
     PosteriorPredictiveFunctions,
     make_summary,

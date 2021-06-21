@@ -3,7 +3,7 @@
 #
 # This module needs config["base_layer"]=config["UK2019mod_pop_xgen"]
 #
-# ci_list = [0.05, 0.95]; num_weeks = 8; output_folders={"web_folder_data": "C:/inetpub/wwwroot/COVID19UK/temp/data/", "web_folder_js": "C:/inetpub/wwwroot/COVID19UK/temp/js/"}
+# ci_list = [0.05, 0.95]; num_weeks = 8; output_folder="C:/inetpub/wwwroot/COVID19UK/temp/"
 # input_path = "H:/Downloads/2021-06-17_uk/"; input_files = [input_path + "inferencedata.nc", input_path + "insample7.nc", input_path + "insample14.nc", input_path + "medium_term.nc", input_path + "reproduction_number.nc"]
 # config = {"base_geopackage":"data/UK2019mod_pop.gpkg", "base_layer":"UK2019mod_pop_xgen"}
 
@@ -11,6 +11,8 @@
 from covid_pipeline.tasks.summary_longformat import xarray2summarydf
 from covid_pipeline.tasks.summary_longformat import prevalence
 from covid_pipeline.tasks import case_exceedance
+
+from pathlib import Path
 
 import datetime
 import dhaconfig
@@ -279,7 +281,7 @@ def insample_write_json(df, web_folder_data, ci_list, name):
     """
     :param df: (dataframe)
     :param web_folder_data: (str) output folder for geojson files e.g. "z:/dha_website_root/data/"
-    :param ci_list: credibility interval list
+    :param ci_list: (list) list of quantile values e.g. [0.05, 0.95] or None
     :parma name: (str) name of layer
     """
     lst = (
@@ -441,7 +443,7 @@ def do_dha_things(
     return make_layer(web_folder_data, name, dates, cis, dha_format, xlsx)
 
 
-def summary_dha(input_files, output_folders, num_weeks, ci_list, config):
+def summary_dha(input_files, output_folder, num_weeks, ci_list, config):
     """Draws together pipeline results into files for DHA
 
     :param input_files: (list) filename list [inferencedata_nc,
@@ -449,8 +451,7 @@ def summary_dha(input_files, output_folders, num_weeks, ci_list, config):
                                               insample14_nc,
                                               medium_term_nc,
                                               reproduction_number_nc]
-    :param output_folders: (dict) dict of output folders e.g. {"web_folder_data": "Z:/folder/data/",
-                                                               "web_folder_js": "Z:/folder/js/"}
+    :param output_folder: (str) output folder e.g. "Z:/folder/"
     :param num_weeks: (int) number of weeks for predictions (untested for over 9 so beware ordering might break)
     :param ci_list: (list) list of quantiles e.g. [0.05, 0.95]
     :param config: SummaryGeopackage configuration information
@@ -463,6 +464,10 @@ def summary_dha(input_files, output_folders, num_weeks, ci_list, config):
     cases = cases.to_dataframe().reset_index()
     dha_format = dha_format_dict()
     layers = {}
+    output_folders = {"web_folder_data": output_folder + "data/",
+                      "web_folder_js": output_folder + "js/"}
+    Path(output_folders["web_folder_data"]).mkdir(parents=True, exist_ok=True)
+    Path(output_folders["web_folder_js"]).mkdir(parents=True, exist_ok=True)
 
     # geopackage: load, select, transform and round
     dec = re.compile(r"\d*\.\d+")
@@ -515,7 +520,6 @@ def summary_dha(input_files, output_folders, num_weeks, ci_list, config):
         )
         * 100000
     )
-    # next line assumes medium_df has columns ["location", "time", "value", "0.05", ... , 0.5, ... , "0.95"]
     layers[name] = do_dha_things(
         medium_df,
         num_weeks,
@@ -530,7 +534,6 @@ def summary_dha(input_files, output_folders, num_weeks, ci_list, config):
     # Medium term prevalence
     name = "Prevalence_per_100k"
     prev_df = prevalence(medium_term, data["N"])
-    # next line assumes prev_df has columns ["location", "time", "value", "0.05", ... , 0.5, ... , "0.95"]
     layers[name] = do_dha_things(
         prev_df,
         num_weeks,
@@ -596,7 +599,6 @@ def summary_dha(input_files, output_folders, num_weeks, ci_list, config):
     )  # in line above if location is the index then this line is needed?
     # del r_it; case_exceed=pd.read_csv('H:/Downloads/2021-06-17_uk/exceedance_summary.csv')
     case_exceed["time"] = default_time
-    # following lines assume case_exceed has columns ["location", "time", "Pr(pred<obs)_7", "Pr(pred<obs)_14"]
 
     # Insample predictive incidence
     name = "Insample_7_days"
@@ -706,3 +708,4 @@ def summary_dha(input_files, output_folders, num_weeks, ci_list, config):
     utils.write_last_updated_time(
         output_folders["web_folder_js"], "lastupdated.js", "last updated: "
     )
+

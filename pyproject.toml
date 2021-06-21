@@ -16,6 +16,7 @@ matplotlib = "^3.4.1"
 descartes = "^1.1.0"
 enum34 = "1.1.8"
 mapclassify = "^2.4.2"
+dhaconfig = {git = "https://gitlab.com/achale/dhaconfig.git"}
 
 [tool.poetry.dev-dependencies]
 jedi = "^0.17.2"

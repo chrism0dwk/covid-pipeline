@@ -347,8 +347,8 @@ def make_layer(web_folder_data, name, dates, cis, pars, xlsx):
         geojsonName=str(list(map(str, range(len(dates))))),
         geojsonGeom="LAD name",
         geojsonExtraInfo="LAD code",
-        mapPosition_centerLatLng=str([54.3, -3.5]),
-        mapPosition_zoom="5",
+        mapPosition_centerLatLng=str([55.5, -2.7]),
+        mapPosition_zoom="5.5",
         regionNames_country="Click region in UK to view its graph",
         regionNames_area="LAD name",
         colgrades_colours=str(pars["colgrades_colours"]),
@@ -682,8 +682,8 @@ def summary_dha(input_files, output_folder, num_weeks, ci_list, config):
     )
     config_data += dha.global_vars(
         radioNotDropdown="false",
-        InitialMapCenterLatLng="[54.3, -3.5]",
-        InitialmapZoom="5",
+        InitialMapCenterLatLng="[55.5, -2.7]",
+        InitialmapZoom="5.5",
         mapUnits="false",
         secondMap="true",
         userDefinedBaseMaps="true",

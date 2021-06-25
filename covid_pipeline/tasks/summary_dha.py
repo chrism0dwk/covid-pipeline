@@ -3,7 +3,7 @@
 #
 # This module needs config["base_layer"]=config["UK2019mod_pop_xgen"]
 #
-# ci_list = [0.05, 0.95]; num_weeks = 8; output_folder="C:/inetpub/wwwroot/COVID19UK/temp/"
+# ci_list = [0.05, 0.95]; num_weeks = 8; output_folder="C:/inetpub/wwwroot/COVID19UK/temp/"; url="https://fhm-chicas-storage.lancs.ac.uk/bayesstm/latest/"
 # input_path = "H:/Downloads/2021-06-17_uk/"; input_files = [input_path + "inferencedata.nc", input_path + "insample7.nc", input_path + "insample14.nc", input_path + "medium_term.nc", input_path + "reproduction_number.nc"]
 # config = {"base_geopackage":"data/UK2019mod_pop.gpkg", "base_layer":"UK2019mod_pop_xgen"}
 
@@ -319,7 +319,7 @@ def insample_write_json(df, web_folder_data, ci_list, name):
     utils.write_text_file(web_folder_data, name + ".json", lst)
 
 
-def make_layer(web_folder_data, name, dates, cis, pars, xlsx):
+def make_layer(web_folder_data, name, dates, cis, pars, xlsx, url):
     """
     :param web_folder_data: (str) output folder for geojson files e.g. "z:/dha_website_root/data/"
     :parma name: (str) name of layer
@@ -327,6 +327,7 @@ def make_layer(web_folder_data, name, dates, cis, pars, xlsx):
     :param cis: (list) list of quantiles e.g. [0.05, 0.95]
     :parma pars: (dict) dictionary of dha parameters: for details see dhaconfig at https://gitlab.com/achale/dhaconfig.git#egg=dhaconfig
     :param xlsx: (boolean) when False downloadData is a csv otherwise xlsx
+    :param url: (str) url of json and geojson data if it is external to the web server
     :return: (str) dha map layer as dictionary
     """
     downloadData_ext = ".xlsx" if xlsx else ".csv"
@@ -334,7 +335,7 @@ def make_layer(web_folder_data, name, dates, cis, pars, xlsx):
         " " if cis is None else str(cis[0]) + "-" + str(cis[1]) + " quantiles"
     )
     layer = dha.build_single_layer(
-        geoJsonFile="data/" + name + ".geojson",
+        geoJsonFile=url + "data/" + name + ".geojson",
         friendlyName=name.replace("_", " ").replace("1 0", "1.0"),
         radioButtonValue=name.replace("_", " ").replace("1 0", "1.0")
         + dates[0].strftime(" %d %b"),
@@ -393,7 +394,7 @@ def make_layer(web_folder_data, name, dates, cis, pars, xlsx):
         units_unicode="predicted "
         + name.replace("_", " ").lower().replace("1 0", "1.0"),
         units_xlab="date from " + dates[0].strftime("%d %b %Y"),
-        downloadData="data/" + name + downloadData_ext,
+        downloadData=url + "data/" + name + downloadData_ext,
         popupBox=pars["popupBox"],
     )
     return layer
@@ -412,6 +413,7 @@ def do_dha_things(
     name,
     dha_format,
     dp,
+    url,
     extra_df=None,
 ):
     """
@@ -423,6 +425,7 @@ def do_dha_things(
     :parma name: (str) name of layer
     :parma dha_format: (dict) dictionary of dha parameters: for details see dhaconfig at https://gitlab.com/achale/dhaconfig.git#egg=dhaconfig
     :param dp: (int) number of decimal places to keep
+    :param url: (str) url of json and geojson data if it is external to the web server
     :param extra_df: (dataframe) additional dataframe for xlsx
     :return: (str) dha map layer as dictionary
     """
@@ -440,10 +443,10 @@ def do_dha_things(
         write_xls(extra_df, df, web_folder_data, name)
         xlsx = True
     dates = pd.DatetimeIndex(df_tidy["time"].unique())
-    return make_layer(web_folder_data, name, dates, cis, dha_format, xlsx)
+    return make_layer(web_folder_data, name, dates, cis, dha_format, xlsx, url)
 
 
-def summary_dha(input_files, output_folder, num_weeks, ci_list, config):
+def summary_dha(input_files, output_folder, num_weeks, ci_list, config, url=""):
     """Draws together pipeline results into files for DHA
 
     :param input_files: (list) filename list [inferencedata_nc,
@@ -455,6 +458,7 @@ def summary_dha(input_files, output_folder, num_weeks, ci_list, config):
     :param num_weeks: (int) number of weeks for predictions (untested for over 9 so beware ordering might break)
     :param ci_list: (list) list of quantiles e.g. [0.05, 0.95]
     :param config: SummaryGeopackage configuration information
+    :param url: (str) url of json and geojson data if it is external to DHA host web server.
     """
 
     # initialise
@@ -493,6 +497,7 @@ def summary_dha(input_files, output_folder, num_weeks, ci_list, config):
         name,
         dha_format[name],
         1,
+        url,
     )
 
     # Cumulative cases
@@ -509,6 +514,7 @@ def summary_dha(input_files, output_folder, num_weeks, ci_list, config):
         name,
         dha_format[name],
         1,
+        url,
     )
 
     # Medium term incidence per 100k
@@ -529,6 +535,7 @@ def summary_dha(input_files, output_folder, num_weeks, ci_list, config):
         name,
         dha_format[name],
         1,
+        url,
     )
 
     # Medium term prevalence
@@ -543,6 +550,7 @@ def summary_dha(input_files, output_folder, num_weeks, ci_list, config):
         name,
         dha_format[name],
         1,
+        url,
     )
 
     # Rt
@@ -563,6 +571,7 @@ def summary_dha(input_files, output_folder, num_weeks, ci_list, config):
         name,
         dha_format[name],
         2,
+        url,
     )
 
     # Prob(Rt>1)
@@ -585,6 +594,7 @@ def summary_dha(input_files, output_folder, num_weeks, ci_list, config):
         name,
         dha_format[name],
         2,
+        url,
     )
 
     # Case exceedance - used by Insample
@@ -634,6 +644,7 @@ def summary_dha(input_files, output_folder, num_weeks, ci_list, config):
         name,
         dha_format[name],
         2,
+        url,
         insample_df_tidy,
     )
 
@@ -669,6 +680,7 @@ def summary_dha(input_files, output_folder, num_weeks, ci_list, config):
         name,
         dha_format[name],
         2,
+        url,
         insample_df_tidy,
     )
 

@@ -28,6 +28,7 @@ from covid_pipeline.tasks import (
     summary_geopackage,
     summary_longformat,
     crystalcast_output,
+    summary_dha,
 )
 
 __all__ = ["run_pipeline"]
@@ -76,7 +77,10 @@ def run_pipeline(global_config, results_directory, cli_options):
         assemble_data(output_file, config["ProcessData"])
 
     @rf.transform(
-        process_data, rf.formatter(), wd("posterior.hd5"), global_config,
+        process_data,
+        rf.formatter(),
+        wd("posterior.hd5"),
+        global_config,
     )
     def run_mcmc(input_file, output_file, config):
         mcmc(input_file, output_file, config["Mcmc"])
@@ -98,7 +102,9 @@ def run_pipeline(global_config, results_directory, cli_options):
     )(reproduction_number)
 
     rf.transform(
-        input=reproduction_number, filter=rf.formatter(), output=wd("national_rt.xlsx"),
+        input=reproduction_number,
+        filter=rf.formatter(),
+        output=wd("national_rt.xlsx"),
     )(overall_rt)
 
     # In-sample prediction
@@ -150,7 +156,9 @@ def run_pipeline(global_config, results_directory, cli_options):
 
     # Summarisation
     rf.transform(
-        input=reproduction_number, filter=rf.formatter(), output=wd("rt_summary.csv"),
+        input=reproduction_number,
+        filter=rf.formatter(),
+        output=wd("rt_summary.csv"),
     )(summarize.rt)
 
     rf.transform(
@@ -223,9 +231,41 @@ def run_pipeline(global_config, results_directory, cli_options):
 
     # DSTL Summary
     rf.transform(
-        [[process_data, insample7, insample14, medium_term, reproduction_number,]],
+        [
+            [
+                process_data,
+                insample7,
+                insample14,
+                medium_term,
+                reproduction_number,
+            ]
+        ],
         rf.formatter(),
         wd("summary_longformat.xlsx"),
     )(summary_longformat)
+
+    # DHA inputs
+    @rf.transform(
+        input=[
+            [
+                process_data,
+                insample7,
+                insample14,
+                medium_term,
+                reproduction_number,
+            ]
+        ],
+        filter=rf.formatter(),
+        output=wd("dha"),
+    )
+    def dha_inputs(input_files, output_path):
+        summary_dha(
+            input_files,
+            output_path,
+            num_weeks=8,
+            ci_list=[0.05, 0.95],
+            config=global_config["Geopackage"],
+            url="https://fhm-chicas-storage.lancs.ac.uk/bayesstm/latest/",
+        )
 
     rf.cmdline.run(cli_options)

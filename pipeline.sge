@@ -79,11 +79,18 @@ poetry run python -m covid_pipeline.pipeline \
 # Push results to bucket
 BASENAME=`basename ${arg_staging_dir}`
 BUCKET_DIR=${arg_results_dir}/${BASENAME}
+DHA_DIR="bayesstm/latest"
 
 module add aws-cli
 aws --endpoint-url https://fhm-chicas-storage.lancs.ac.uk s3 \
     --profile covid-pipeline-data \
     cp --recursive ${arg_staging_dir} ${BUCKET_DIR}
+
+# Push dha to bayesstm bucket
+aws --endpoint-url https://fhm-chicas-storage.lancs.ac.uk s3 \
+    --profile bayesstm \
+    cp --recursive ${arg_staging_dir}/dha ${DHA_DIR}
+
 
 # Trigger report
 REPORTBRANCH=master

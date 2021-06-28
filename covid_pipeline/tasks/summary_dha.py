@@ -7,7 +7,6 @@
 # input_path = "H:/Downloads/2021-06-17_uk/"; input_files = [input_path + "inferencedata.nc", input_path + "insample7.nc", input_path + "insample14.nc", input_path + "medium_term.nc", input_path + "reproduction_number.nc"]
 # config = {"base_geopackage":"data/UK2019mod_pop.gpkg", "base_layer":"UK2019mod_pop_xgen"}
 
-
 from covid_pipeline.tasks.summary_longformat import xarray2summarydf
 from covid_pipeline.tasks.summary_longformat import prevalence
 from covid_pipeline.tasks import case_exceedance
@@ -261,7 +260,7 @@ def write_csv(x, cis, folder, file_name):
             axis="columns",
         )
     y = pd.DataFrame(y)
-    y.to_csv(folder + file_name + ".csv")
+    y.to_csv(Path(folder) / f"{file_name}.csv")
 
 
 def write_xls(df1, df2, web_folder_data, name):
@@ -271,7 +270,9 @@ def write_xls(df1, df2, web_folder_data, name):
     :param web_folder_data: (str) output folder for geojson files e.g. "z:/dha_website_root/data/"
     :parma name: (str) name of layer
     """
-    writer = pd.ExcelWriter(web_folder_data + name + ".xlsx", engine="openpyxl")
+    writer = pd.ExcelWriter(
+        Path(web_folder_data) / f"{name}.xlsx", engine="openpyxl"
+    )
     df1.to_excel(writer, sheet_name="Insample")
     df2.to_excel(writer, sheet_name="Pr(pred<obs)")
     writer.save()
@@ -468,10 +469,13 @@ def summary_dha(input_files, output_folder, num_weeks, ci_list, config, url=""):
     cases = cases.to_dataframe().reset_index()
     dha_format = dha_format_dict()
     layers = {}
-    output_folders = {"web_folder_data": output_folder + "data/",
-                      "web_folder_js": output_folder + "js/"}
-    Path(output_folders["web_folder_data"]).mkdir(parents=True, exist_ok=True)
-    Path(output_folders["web_folder_js"]).mkdir(parents=True, exist_ok=True)
+    output_folders = {
+        "web_folder_data": Path(output_folder) / "data",
+        "web_folder_js": Path(output_folder) / "js",
+    }
+    for k, v in output_folders.items():
+        print(f"Making folder: 'v'")
+        v.mkdir(parents=True, exist_ok=True)
 
     # geopackage: load, select, transform and round
     dec = re.compile(r"\d*\.\d+")
@@ -720,4 +724,3 @@ def summary_dha(input_files, output_folder, num_weeks, ci_list, config, url=""):
     utils.write_last_updated_time(
         output_folders["web_folder_js"], "lastupdated.js", "last updated: "
     )
-

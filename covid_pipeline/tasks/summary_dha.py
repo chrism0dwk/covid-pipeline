@@ -75,7 +75,7 @@ def dha_format_dict():
     dha_format = {
         "Daily_case_incidence": {
             "colgrades_colours": colour_scheme_a,
-            "colgrades_Ints": "10",
+            "colgrades_Ints": "15",
             "colgrades_userDefined": "undefined",
             "colgrades_legtitle": "undefined",
             "timeData_timeseries": "true",
@@ -84,7 +84,7 @@ def dha_format_dict():
         },
         "Cumulative_case_incidence": {
             "colgrades_colours": colour_scheme_a,
-            "colgrades_Ints": "100",
+            "colgrades_Ints": "200",
             "colgrades_userDefined": "undefined",
             "colgrades_legtitle": "undefined",
             "timeData_timeseries": "true",
@@ -93,7 +93,7 @@ def dha_format_dict():
         },
         "Daily_case_incidence_per_100k": {
             "colgrades_colours": colour_scheme_a,
-            "colgrades_Ints": "3",
+            "colgrades_Ints": "10",
             "colgrades_userDefined": "undefined",
             "colgrades_legtitle": "undefined",
             "timeData_timeseries": "true",
@@ -102,7 +102,7 @@ def dha_format_dict():
         },
         "Prevalence_per_100k": {
             "colgrades_colours": colour_scheme_a,
-            "colgrades_Ints": "25",
+            "colgrades_Ints": "75",
             "colgrades_userDefined": "undefined",
             "colgrades_legtitle": "undefined",
             "timeData_timeseries": "true",

@@ -9,7 +9,7 @@ license = "MIT"
 python = "^3.7"
 xarray = {extras = ["netcdf4"], version = "^0.17.0"}
 s3fs = "^2021.04.0"
-covid19uk = {git = "https://github.com/chrism0dwk/covid19uk.git", tag="v0.8.0-alpha.3"}
+covid19uk = {git = "https://gitlab.com/chicas-covid19/covid19uk.git", tag="v0.8.0-alpha.4"}
 ruffus = "^2.8.4"
 openpyxl = "^3.0.7"
 matplotlib = "^3.4.1"

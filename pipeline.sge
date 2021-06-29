@@ -12,11 +12,11 @@
 
 #$ -S /bin/bash
 #$ -P chicas
-#$ -q medium
+#$ -q short
 #$ -l ngpus=1
 # -l ncpus=4
 #$ -l h_vmem=64G
-#$ -l h_rt=24:00:00
+#$ -l h_rt=10:00:00
 #$ -j y
 #$ -cwd
 #$ -M c.jewell@lancaster.ac.uk

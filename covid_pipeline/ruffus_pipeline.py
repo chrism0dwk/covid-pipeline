@@ -29,6 +29,7 @@ from covid_pipeline.tasks import (
     summary_longformat,
     crystalcast_output,
     summary_dha,
+    lancs_risk_report,
 )
 
 __all__ = ["run_pipeline"]
@@ -268,4 +269,14 @@ def run_pipeline(global_config, results_directory, cli_options):
             url="https://fhm-chicas-storage.lancs.ac.uk/bayesstm/latest/",
         )
 
+    # Lancashire CC report
+    @rf.transform(
+        input=summary_geopackage,
+        filter=rf.formatter(),
+        output=wd("lancs_risk_report.xlsx"),
+        )
+    def lancs(input, output):
+        lancs_risk_report(input, output, pipeline_meta['created_at'])
+
+        
     rf.cmdline.run(cli_options)

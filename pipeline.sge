@@ -64,7 +64,10 @@ module add cuda/11.0
 
 export XLA_FLAGS="--xla_gpu_cuda_data_dir=$CUDA_HOME"
 
-
+DHA_DIR="s3://bayesstm/latest"
+BASENAME=`basename ${arg_staging_dir}`
+BUCKET_DIR=${arg_results_dir}/${BASENAME}
+GEOGRAPHY=`echo ${BASENAME} | cut -d"_" -f2`
 DATEHIGH=`date -d "${arg_date}" +%F`
 DATELOW=`date -d "${arg_date} - 84 days" +%F`
 
@@ -76,25 +79,35 @@ poetry run python -m covid_pipeline.pipeline \
       -v ||
     error_exit "Pipeline job failed"
 
-# Push results to bucket
-BASENAME=`basename ${arg_staging_dir}`
-BUCKET_DIR=${arg_results_dir}/${BASENAME}
-DHA_DIR="bayesstm/latest"
 
+# Adapt Scotland data format
+if [ $GEOGRAPHY = uk ]; then
+    echo "Adapting Scotland data"
+    module add R
+    Rscript R/Clean_Lancaster_data.R \
+	    ${arg_staging_dir}/summary_longformat.xlsx \
+	    ${arg_staging_dir}/scotland_output.xlsx || error_exit "Scotland data failed"
+    module remove R
+fi
+
+
+# Push results to buckets
+echo "Push to ${BUCKET_DIR}"
 module add aws-cli
 aws --endpoint-url https://fhm-chicas-storage.lancs.ac.uk s3 \
     --profile covid-pipeline-data \
     cp --recursive ${arg_staging_dir} ${BUCKET_DIR}
 
 # Push dha to bayesstm bucket
-aws --endpoint-url https://fhm-chicas-storage.lancs.ac.uk s3 \
-    --profile bayesstm \
-    cp --recursive ${arg_staging_dir}/dha ${DHA_DIR}
-
+if [ $GEOGRAPHY = uk ]; then
+    echo "Push to $DHA_DIR"
+    aws --endpoint-url https://fhm-chicas-storage.lancs.ac.uk s3 \
+	--profile bayesstm \
+	cp --recursive "${arg_staging_dir}/dha" ${DHA_DIR}
+fi
 
 # Trigger report
 REPORTBRANCH=master
-GEOGRAPHY=`echo ${BASENAME} | cut -d"_" -f2`
 echo "Reporting for geography '$GEOGRAPHY'"
 if [ $GEOGRAPHY = england1 ]; then
     REPORTBRANCH=england1
@@ -105,5 +118,8 @@ curl -X POST \
      -F "ref=$REPORTBRANCH" \
      -F "variables[S3TARGET]=${BUCKET_DIR}" \
      https://fhm-chicas-code.lancs.ac.uk/api/v4/projects/163/trigger/pipeline
+
+echo "Pipeline succeeded, writing notification file to $global_storage/covid_notify/${GEOGRAPHY}_complete.notify"
+echo ${arg_staging_dir} > ${global_storage}/covid_notify/${GEOGRAPHY}_complete.notify
 
 exit 0

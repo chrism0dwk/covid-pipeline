@@ -16,7 +16,7 @@ descartes = "^1.1.0"
 enum34 = "1.1.8"
 mapclassify = "^2.4.2"
 dhaconfig = {git = "https://gitlab.com/achale/dhaconfig.git", tag="v0.0.2"}
-covid19uk = {git = "https://gitlab.com/chicas-covid19/covid19uk.git", tag="v0.8.0-alpha.4"}
+covid19uk = {git = "https://gitlab.com/chicas-covid19/covid19uk.git", tag="v0.8.0-alpha.5"}
 
 [tool.poetry.dev-dependencies]
 jedi = "^0.17.2"

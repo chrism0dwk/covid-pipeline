@@ -10,6 +10,7 @@ from covid_pipeline.tasks.summary_longformat import summary_longformat
 import covid_pipeline.tasks.summarize as summarize
 from covid_pipeline.tasks.crystalcast_output import crystalcast_output
 from covid_pipeline.tasks.summary_dha import summary_dha
+from covid_pipeline.tasks.lancs_risk_report import report_lancs as lancs_risk_report
 
 __all__ = [
     "overall_rt",
@@ -20,4 +21,5 @@ __all__ = [
     "summarize",
     "crystalcast_output",
     "summary_dha",
+    "lancs_risk_report",
 ]

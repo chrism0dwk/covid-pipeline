@@ -34,7 +34,10 @@ Mcmc:
   num_burst_samples: 200  # Number of MCMC samples per burst
   thin: 20  # Thin MCMC samples every `thin` iterations
   num_adaptation_iterations: 1000
-
+  initial_rates:
+    ei: 0.5
+    ir: 0.37
+    
 ThinPosterior:  # Post-process further chain thinning HDF5 -> .pkl.
   start: -10000
   end: 

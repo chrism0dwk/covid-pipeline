@@ -114,10 +114,10 @@ def summarize_supergeography(event_samples, rt, population, geography_name):
     """
 
     # Incidence
-    incidence_xarr = incidence(event_samples, population)
+#    incidence_xarr = incidence(event_samples, population)
 
     # Prevalence
-    prev_xarr = prevalence(event_samples, population)
+#    prev_xarr = prevalence(event_samples, population)
 
     # Rt
     rt_summary = (rt["R_it"] * population / population.sum()).sum(
@@ -126,8 +126,8 @@ def summarize_supergeography(event_samples, rt, population, geography_name):
 
     df = pd.concat(
         [
-            _xarray2dstl(incidence_xarr, "incidence", geography_name),
-            _xarray2dstl(prev_xarr, "prevalence", geography_name),
+#            _xarray2dstl(incidence_xarr, "incidence", geography_name),
+#            _xarray2dstl(prev_xarr, "prevalence", geography_name),
             _xarray2dstl(rt_summary, "R", geography_name),
         ],
         axis=0,

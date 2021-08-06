@@ -14,7 +14,7 @@
 #$ -P chicas
 #$ -q short
 #$ -l ngpus=1
-# -l ncpus=4
+#$ -l ncpus=4
 #$ -l h_vmem=64G
 #$ -l h_rt=10:00:00
 #$ -j y
@@ -60,7 +60,7 @@ done
 . /etc/profile
 . $HOME/.bash_profile
 
-module add cuda/11.0
+module add cuda/11.2
 
 export XLA_FLAGS="--xla_gpu_cuda_data_dir=$CUDA_HOME"
 

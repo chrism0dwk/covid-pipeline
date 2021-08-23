@@ -64,12 +64,15 @@ module add cuda/11.2
 
 export XLA_FLAGS="--xla_gpu_cuda_data_dir=$CUDA_HOME"
 
-DHA_DIR="s3://bayesstm/latest"
+DATEHIGH=`date -d "${arg_date}" +%F`
+DATELOW=`date -d "${arg_date} - 84 days" +%F`
+
 BASENAME=`basename ${arg_staging_dir}`
 BUCKET_DIR=${arg_results_dir}/${BASENAME}
 GEOGRAPHY=`echo ${BASENAME} | cut -d"_" -f2`
-DATEHIGH=`date -d "${arg_date}" +%F`
-DATELOW=`date -d "${arg_date} - 84 days" +%F`
+DHA_LATEST_DIR="s3://bayesstm/latest"
+DHA_DATED_DIR="s3://bayesstm/$DATEHIGH/dha"
+
 
 echo Date range $DATELOW to $DATEHIGH
 poetry run python -m covid_pipeline.pipeline \
@@ -100,10 +103,12 @@ aws --endpoint-url https://fhm-chicas-storage.lancs.ac.uk s3 \
 
 # Push dha to bayesstm bucket
 if [ $GEOGRAPHY = uk ]; then
-    echo "Push to $DHA_DIR"
-    aws --endpoint-url https://fhm-chicas-storage.lancs.ac.uk s3 \
+    for DHA_DIR in $DHA_LATEST_DIR $DHA_DATED_DIR; do
+	echo "Push to $DHA_DIR"
+	aws --endpoint-url https://fhm-chicas-storage.lancs.ac.uk s3 \
 	--profile bayesstm \
 	cp --recursive "${arg_staging_dir}/dha" ${DHA_DIR}
+    done
 fi
 
 # Trigger report

@@ -266,7 +266,7 @@ def run_pipeline(global_config, results_directory, cli_options):
             num_weeks=8,
             ci_list=[0.05, 0.95],
             config=global_config["Geopackage"],
-            url="https://fhm-chicas-storage.lancs.ac.uk/bayesstm/latest/",
+            url="https://fhm-chicas-storage.lancs.ac.uk/bayesstm/'+websiteDate+'/",
         )
 
     # Lancashire CC report
@@ -274,9 +274,8 @@ def run_pipeline(global_config, results_directory, cli_options):
         input=summary_geopackage,
         filter=rf.formatter(),
         output=wd("lancs_risk_report.xlsx"),
-        )
+    )
     def lancs(input, output):
-        lancs_risk_report(input, output, pipeline_meta['created_at'])
+        lancs_risk_report(input, output, pipeline_meta["created_at"])
 
-        
     rf.cmdline.run(cli_options)

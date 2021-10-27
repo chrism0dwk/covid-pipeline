@@ -63,7 +63,7 @@ done
 module add cuda/11.2
 
 export XLA_FLAGS="--xla_gpu_cuda_data_dir=$CUDA_HOME"
-
+RUNDATE=`date +%F`
 DATEHIGH=`date -d "${arg_date}" +%F`
 DATELOW=`date -d "${arg_date} - 84 days" +%F`
 
@@ -71,7 +71,7 @@ BASENAME=`basename ${arg_staging_dir}`
 BUCKET_DIR=${arg_results_dir}/${BASENAME}
 GEOGRAPHY=`echo ${BASENAME} | cut -d"_" -f2`
 DHA_LATEST_DIR="s3://bayesstm/latest"
-DHA_DATED_DIR="s3://bayesstm/$DATEHIGH/dha"
+DHA_DATED_DIR="s3://bayesstm/$RUNDATE/dha"
 
 
 echo Date range $DATELOW to $DATEHIGH

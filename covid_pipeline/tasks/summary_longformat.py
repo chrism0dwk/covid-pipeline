@@ -174,11 +174,11 @@ if __name__ == "__main__":
     input_files = [
         os.path.join(args.resultsdir, d)
         for d in [
-            "pipeline_data.pkl",
+            "inferencedata.nc",
             "insample7.nc",
             "insample14.nc",
             "medium_term.nc",
-            "ngm.nc",
+            "reproduction_number.nc",
         ]
     ]
 

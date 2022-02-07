@@ -13,7 +13,7 @@ ProcessData:
     input: csv
     address: data/latest_line_list.zip
     pillars:
-      - Pillar 1  # Capability to filter Pillar 1 and 2 testing data from PHE confidential line listing
+      - PILLAR1  # Capability to filter Pillar 1 and 2 testing data from PHE confidential line listing
     measure: specimen  # Capability to filter date of test report from PHE confidential line listing
     format: phe
  

@@ -192,7 +192,7 @@ def run_pipeline(global_config, results_directory, cli_options):
             {"Pr(pred<obs)_7": exceed7, "Pr(pred<obs)_14": exceed14},
             index=exceed7.coords["location"],
         )
-        df.to_csv(output_file)
+        df.to_csv(output_file, index_label="location")
 
     # Plot in-sample
     # @rf.transform(

@@ -606,7 +606,7 @@ def summary_dha(input_files, output_folder, num_weeks, ci_list, config, url=""):
     exceed14 = case_exceedance((input_files[0], input_files[2]), 14)
     case_exceed = pd.DataFrame(
         {"Pr(pred<obs)_7": exceed7, "Pr(pred<obs)_14": exceed14},
-        index=exceed7.coords["location"],
+        index=pd.Index(exceed7.coords["location"], name="location"),
     )
     case_exceed = (
         case_exceed.reset_index()

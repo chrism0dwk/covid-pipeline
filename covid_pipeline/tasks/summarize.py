@@ -68,7 +68,7 @@ def infec_incidence(input_file, output_file):
         num_events = np.sum(events, axis=-1)
         return mean_and_ci(num_events, name=name)
 
-    idx = prediction.coords["location"]
+    idx = pd.Index(prediction.coords["location"], name="location")
 
     abs_incidence = pd.DataFrame(
         pred_events(prediction[..., offset : (offset + 1), 2], name="cases"),
@@ -81,7 +81,7 @@ def infec_incidence(input_file, output_file):
         )
         abs_incidence = pd.concat([abs_incidence, tmp], axis="columns")
 
-    abs_incidence.to_csv(output_file)
+    abs_incidence.to_csv(output_file, index_label="location")
 
 
 def prevalence(input_files, output_file):
@@ -105,7 +105,7 @@ def prevalence(input_files, output_file):
         prev = np.sum(state[..., 1:3], axis=-1) / np.array(data["N"])
         return mean_and_ci(prev, name=name)
 
-    idx = prediction.coords["location"]
+    idx = pd.Index(prediction.coords["location"], name="location")
     prev = pd.DataFrame(
         calc_prev(predicted_state[..., timepoints[0], :], name="prev"),
         index=idx,
@@ -117,4 +117,4 @@ def prevalence(input_files, output_file):
         )
         prev = pd.concat([prev, tmp], axis="columns")
 
-    prev.to_csv(output_file)
+    prev.to_csv(output_file, index_label="location")
